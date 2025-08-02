@@ -1,0 +1,16 @@
+{
+  "name": "Python Bot",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "settings": {
+    "terminal.integrated.defaultProfile.linux": "bash"
+  },
+  "postCreateCommand": "pip install --upgrade pip && pip install -r requirements.txt && pip install git+https://github.com/twopirllc/pandas-ta.git",
+  "extensions": ["ms-python.python"],
+  "features": {
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "3.11"
+    }
+  }
+}
