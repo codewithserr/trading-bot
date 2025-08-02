@@ -1,20 +1,29 @@
-import yfinance as yf
-import pandas_ta as ta
-import matplotlib.pyplot as plt
+from data_fetcher import fetch_daily_data
+from indicators import add_indicators
 from signals import detect_signals
+from dotenv import load_dotenv
+import os
 
-symbol = "SPY"
-data = yf.download(symbol, start="2022-01-01", end="2025-08-01")
+def main():
 
-data["RSI"] = ta.rsi(data["Close"], length=14)
-data["SMA_50"] = ta.sma(data["Close"], length=50)
-data["SMA_200"] = ta.sma(data["Close"], length=200)
+    # Cargar .env
+    load_dotenv()
 
-signals = detect_signals(data)
-for date, signal in signals:
-    print(f"{date.date()} - Señal detectada: {signal}")
+    API_KEY = os.getenv("ALPHA_VANTAGE_API_KEY")
+    if not API_KEY:
+        raise Exception("Por favor define la variable de entorno ALPHAVANTAGE_API_KEY con tu API key")
 
-data[["Close", "SMA_50", "SMA_200"]].plot(figsize=(12, 6))
-plt.title(f"{symbol} con SMA 50 y 200")
-plt.grid()
-plt.show()
+    SYMBOL = "SPY"
+
+    df = fetch_daily_data(SYMBOL, API_KEY)
+    df = add_indicators(df)
+    signals = detect_signals(df)
+    print(df.tail(10)[['close', 'RSI', 'SMA_50', 'SMA_200']])
+
+
+    print(f"Señales detectadas para {SYMBOL}:")
+    for date, signal in signals:
+        print(f"{date.date()}: {signal}")
+
+if __name__ == "__main__":
+    main()
